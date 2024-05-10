@@ -1,7 +1,7 @@
 # Decklist file name
-DECK_LIST = "Deck.txt"
+DECK_LIST = "reference/Yawgmoth 24-05-08.txt"
 # Collection file name
-EXCEL_FILE = "Collection.xlsx"
+EXCEL_FILE = "reference/MTG - Collection.xlsx"
 
 from collections import Counter
 
