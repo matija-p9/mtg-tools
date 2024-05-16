@@ -10,7 +10,7 @@ def metagame(excel_file, t_date_1, t_date_2):
     tournaments = []
     is_left_bound = False
     for cell in ws[1]:
-        # Logic to check  area between two given dates.
+        # Logic to check area between two given dates.
         if t_date_1 in str(cell.value): is_left_bound = True
         if str(cell.value) != "None" and is_left_bound:
             tournaments.append(str(cell.value)[:10])
@@ -25,10 +25,12 @@ def metagame(excel_file, t_date_1, t_date_2):
                 j = 0
                 while j < TOURNAMENT_SIZE:
                     # Add non-empty cells from that date to decks list.
-                    if ws.cell(row=cell.row+2+j,
-                               column=cell.column+2).value:
-                        decks.append(ws.cell(row=cell.row+2+j,
-                                             column=cell.column+2).value)
+                    deck = ws.cell(row=cell.row+2+j, column=cell.column+2).value
+                    if deck:
+                        # Remove the brackets for minor deck differences.
+                        if deck.find('(') != -1:
+                            decks.append(deck[:deck.find('(')-1])
+                        else: decks.append(deck)
                     j += 1
                 if i < len(tournaments)-1: i += 1
 
@@ -66,28 +68,35 @@ def deck_wr(excel_file, t_date_1, t_date_2):
         # Assign the correctly dated sheet.
         ws = excel_file[date]
         i = 1   # Iterator for rows reference.
-        for row in ws:
+        for row in ws:    
+            deck_left = str(ws['B'+str(i)].value)
+            deck_right = str(ws['E'+str(i)].value)
+            # Remove the brackets for minor deck differences.
+            if deck_left.find('(') != -1:
+                deck_left = deck_left[:deck_left.find('(')-1]
+            if deck_right.find('(') != -1:
+                deck_right = deck_right[:deck_right.find('(')-1]
             # Skip ROUND separator rows.
             if "ROUND" in str(ws['A'+str(i)].value):
                 i += 1
                 continue
             # Compare deck names, if mirror match, skip row.
-            if ws['B'+str(i)].value == ws['E'+str(i)].value:
+            if deck_left == deck_right:
                 i += 1
                 continue
             # Compare score, if equal (draw), both are losers.
             if ws['C'+str(i)].value == ws['D'+str(i)].value:
-                losers.append(ws['B'+str(i)].value)
-                losers.append(ws['E'+str(i)].value)
+                losers.append(deck_left)
+                losers.append(deck_right)
                 i += 1
                 continue
             # Check C and D columns for winner and loser, append.
             if ws['C'+str(i)].value > ws['D'+str(i)].value:
-                winners.append(ws['B'+str(i)].value)
-                losers.append(ws['E'+str(i)].value)
+                winners.append(deck_left)
+                losers.append(deck_right)
             else:
-                winners.append(ws['E'+str(i)].value)
-                losers.append(ws['B'+str(i)].value)
+                winners.append(deck_right)
+                losers.append(deck_left)
             i += 1
 
     return winners, losers

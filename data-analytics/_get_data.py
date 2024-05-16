@@ -1,8 +1,8 @@
 import calculate as calc
 import openpyxl
 
-excel_file = openpyxl.load_workbook("./reference/liga2.xlsx")
-date_range = ["2024-05-08", "2024-05-08"]
+excel_file = openpyxl.load_workbook("./reference/MTG Pula - Liga 2024 #1.xlsx")
+date_range = ["2024-05-15", "2024-04-24"]
 
 # Get metagame split per deck.
 decks, meta_split = calc.metagame(excel_file, date_range[0], date_range[1])
