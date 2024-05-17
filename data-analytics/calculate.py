@@ -38,13 +38,18 @@ def metagame(excel_file, t_date_1, t_date_2):
     from collections import Counter
     decks_count = Counter(decks)
     # Calculate and assign meta presence % to each deck.
+    unsort_dc = {}
     for deck in decks_count:
-        decks_count[deck] = float(decks_count[deck] / len(decks) * 100)
+        unsort_dc[deck] = float(decks_count[deck] / len(decks) * 100)
     # Sort data in descending, alphabetical order.
-    sort_dc_alpha = dict(sorted(decks_count.items()))
-    meta_split = dict(sorted(sort_dc_alpha.items(), key=lambda item:item[1], reverse=True))
+    sort_dc_alpha = dict(sorted(unsort_dc.items()))
+    meta_percentage = dict(sorted(sort_dc_alpha.items(), key=lambda item:item[1], reverse=True))
+    # Populate a list with meta presence ratios.
+    meta_ratio = []
+    for deck in meta_percentage:
+        meta_ratio.append([deck, decks_count[deck], len(decks)])
 
-    return decks, meta_split
+    return decks, meta_percentage, meta_ratio
 
 ##################################################################################
 # Separate winners and losers into lists, ignoring mirrors for decks. Draw = loss.
@@ -155,23 +160,31 @@ def winrate(winners, losers):
     winners_ord = Counter(winners)
     losers_ord = Counter(losers)
 
-    # Prepare a dictionary (key:"PLAYER|DECK", value:WINRATE).
-    winrate = {}
+    winrate_percentage = {} # Dictionary (key:"PLAYER|DECK", value:WINRATE)
+    winrate_ratio = [] # List ([PLAYER|DECK, WINS, MATCHES])
     # For every winner, find a corresponding loser.
     for winner in winners_ord:
         for loser in losers_ord:
             # If loser has no wins, winrate = 0.
-            if loser not in winners: winrate[loser] = float(0)
+            if loser not in winners:
+                winrate_percentage[loser] = float(0)
+                winrate_ratio.append([loser, 0, losers_ord[loser]])
             if winner != loser: continue
             # Calculate winrate (wins / games played).
-            winrate[winner] = winners_ord[winner] * 100 / (
-                            winners_ord[winner] + losers_ord[loser])
+            winrate_percentage[winner] = winners_ord[winner] * 100 / (
+                                         winners_ord[winner] + losers_ord[loser])
+            winrate_ratio.append([winner,
+                                  winners_ord[winner],
+                                  winners_ord[winner] + losers_ord[loser]])
         # If winner has no losses, winrate = 100.
-        if winner not in winrate:
-            winrate[winner] = float(100)
+        if winner not in winrate_percentage:
+            winrate_percentage[winner] = float(100)
+            winrate_ratio.append([winner,
+                                  winners_ord[winner],
+                                  winners_ord[winner]])
 
-    # Sort data in descending, alphabetical order.
-    sort_wr_alpha = dict(sorted(winrate.items()))
-    winrate = dict(sorted(sort_wr_alpha.items(), key=lambda item:item[1], reverse=True))
+    # Sort dict data in descending, alphabetical order.
+    sort_wr_alpha = dict(sorted(winrate_percentage.items()))
+    winrate_percentage = dict(sorted(sort_wr_alpha.items(), key=lambda item:item[1], reverse=True))
 
-    return winrate
+    return winrate_percentage, winrate_ratio
