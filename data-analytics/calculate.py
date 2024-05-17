@@ -4,7 +4,7 @@ def metagame(excel_file, t_date_1, t_date_2):
     ws = excel_file["Sheet1"]
 
     # Arbitrary upper limit for search purposes.
-    TOURNAMENT_SIZE = 50
+    TOURNAMENT_SIZE = 100
 
     # Prepare a list of tournaments.
     tournaments = []
