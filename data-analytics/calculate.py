@@ -219,5 +219,6 @@ def matchup_matrix(excel_file, date_list, deck_name):
             i += 1
     
     #! Sort data before returning.
+    #! Alphabetically? Custom?
 
     return matchup_matrix
