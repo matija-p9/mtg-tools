@@ -1,27 +1,34 @@
-################################################################
-# Calculate and return list of decks and meta presence per deck.
-def metagame(excel_file, t_date_1, t_date_2):
+########################################
+# Convert date range into list of dates.
+def tournament_dates(excel_file, t_date_1, t_date_2):
     ws = excel_file["Sheet1"]
 
-    # Arbitrary upper limit for search purposes.
-    TOURNAMENT_SIZE = 100
-
-    # Prepare a list of tournaments.
-    tournaments = []
+    # Prepare an empty list and a boolean for bounding.
+    date_list = []
     is_left_bound = False
     for cell in ws[1]:
         # Logic to check area between two given dates.
         if t_date_1 in str(cell.value): is_left_bound = True
         if str(cell.value) != "None" and is_left_bound:
-            tournaments.append(str(cell.value)[:10])
+            date_list.append(str(cell.value)[:10])
         if t_date_2 in str(cell.value): break
+    
+    return date_list
+
+################################################################
+# Calculate and return list of decks and meta presence per deck.
+def metagame(excel_file, date_list):
+    ws = excel_file["Sheet1"]
+
+    # Arbitrary upper limit for search purposes.
+    TOURNAMENT_SIZE = 100
 
     decks = []
     i = 0   # Iterator for tournament reference.
     # Search the sheet for tournaments.
     for row in ws:
         for cell in row:
-            if tournaments[i] in str(cell.value):
+            if date_list[i] in str(cell.value):
                 j = 0
                 while j < TOURNAMENT_SIZE:
                     # Add non-empty cells from that date to decks list.
@@ -32,7 +39,7 @@ def metagame(excel_file, t_date_1, t_date_2):
                             decks.append(deck[:deck.find('(')-1])
                         else: decks.append(deck)
                     j += 1
-                if i < len(tournaments)-1: i += 1
+                if i < len(date_list)-1: i += 1
 
     # Convert decks into a Counter.
     from collections import Counter
@@ -53,23 +60,13 @@ def metagame(excel_file, t_date_1, t_date_2):
 
 ##################################################################################
 # Separate winners and losers into lists, ignoring mirrors for decks. Draw = loss.
-def deck_wr(excel_file, t_date_1, t_date_2):
+def deck_wr(excel_file, date_list):
     ws = excel_file["Sheet1"]
-
-    # Prepare a list of tournaments.
-    tournaments = []
-    is_left_bound = False
-    for cell in ws[1]:
-        # Logic to check  area between two given dates.
-        if t_date_1 in str(cell.value): is_left_bound = True
-        if str(cell.value) != "None" and is_left_bound:
-            tournaments.append(str(cell.value)[:10])
-        if t_date_2 in str(cell.value): break
 
     # Prepare empty lists to populate.
     winners = []
     losers = []
-    for date in tournaments:
+    for date in date_list:
         # Assign the correctly dated sheet.
         ws = excel_file[date]
         i = 1   # Iterator for rows reference.
@@ -108,23 +105,13 @@ def deck_wr(excel_file, t_date_1, t_date_2):
 
 ######################################################
 # Separate winners and losers into lists. Draw = loss.
-def player_wr(excel_file, t_date_1, t_date_2):
+def player_wr(excel_file, date_list):
     ws = excel_file["Sheet1"]
-
-    # Prepare a list of tournaments.
-    tournaments = []
-    is_left_bound = False
-    for cell in ws[1]:
-        # Logic to check  area between two given dates.
-        if t_date_1 in str(cell.value): is_left_bound = True
-        if str(cell.value) != "None" and is_left_bound:
-            tournaments.append(str(cell.value)[:10])
-        if t_date_2 in str(cell.value): break
 
     # Prepare empty lists to populate.
     winners = []
     losers = []
-    for date in tournaments:
+    for date in date_list:
         # Assign the correctly dated sheet.
         ws = excel_file[date]
         i = 1   # Iterator for rows reference.
@@ -188,3 +175,49 @@ def winrate(winners, losers):
     winrate_percentage = dict(sorted(sort_wr_alpha.items(), key=lambda item:item[1], reverse=True))
 
     return winrate_percentage, winrate_ratio
+
+####################################################
+# Parse and establish a matchup matrix given a deck.
+
+def matchup_matrix(excel_file, date_list, deck_name):
+    ws = excel_file["Sheet1"]
+   
+    # Prepare empty dictionary to populate.
+    matchup_matrix = {}
+    for date in date_list:
+        # Assign the correctly dated sheet.
+        ws = excel_file[date]
+        i = 1   # Iterator for rows reference.
+        for row in ws:
+            deck_left = str(ws['B'+str(i)].value)
+            deck_right = str(ws['E'+str(i)].value)
+            # Remove the brackets for minor deck differences.
+            if deck_left.find('(') != -1:
+                deck_left = deck_left[:deck_left.find('(')-1]
+            if deck_right.find('(') != -1:
+                deck_right = deck_right[:deck_right.find('(')-1]
+            # Check only if matchup IS NOT mirror.
+            if deck_left != deck_right:
+                if deck_left == deck_name:
+                    # Count deck left-hand side wins.
+                    if ws['C'+str(i)].value > ws['D'+str(i)].value:
+                        try: matchup_matrix[deck_right][0] += 1
+                        except: matchup_matrix[deck_right] = [1, 0]
+                    # Count deck left-hand side losses.
+                    elif ws['C'+str(i)].value < ws['D'+str(i)].value:
+                        try: matchup_matrix[deck_right][1] += 1
+                        except: matchup_matrix[deck_right] = [0, 1]
+                if deck_right == deck_name:
+                    # Count deck right-hand side wins.
+                    if ws['C'+str(i)].value < ws['D'+str(i)].value:
+                        try: matchup_matrix[deck_left][0] += 1
+                        except: matchup_matrix[deck_left] = [1, 0]
+                    # Count deck right-hand side losses.
+                    elif ws['C'+str(i)].value > ws['D'+str(i)].value:
+                        try: matchup_matrix[deck_left][1] += 1
+                        except: matchup_matrix[deck_left] = [0, 1]                    
+            i += 1
+    
+    #! Sort data before returning.
+
+    return matchup_matrix

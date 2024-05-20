@@ -1,12 +1,17 @@
 import calculate as calc
 import openpyxl
-excel_file = openpyxl.load_workbook("./reference/MTG Pula - Liga 2024 #1.xlsx")
-date_range = ["2024-05-15", "2024-04-24"]
 
-'''
-Get metagame split per deck.
-'''
-decks, meta_percentage, meta_ratio = calc.metagame(excel_file, date_range[0], date_range[1])
+EXCEL_FILE = openpyxl.load_workbook("./reference/MTG Pula - Liga 2024 #1.xlsx")
+DATE_RANGE = ["2024-05-15", "2024-04-24"]
+
+date_list = calc.tournament_dates(EXCEL_FILE, DATE_RANGE[0], DATE_RANGE[1])
+
+'''''''''''''''''''''
+GET METAGAME SPLIT PER DECK.
+'''''''''''''''''''''
+
+# Function call to process data.
+decks, meta_percentage, meta_ratio = calc.metagame(EXCEL_FILE, date_list)
 winrate_ratio = {}
 i = 0
 # Convert data to dict for use.
@@ -20,10 +25,12 @@ print("--------------")
 for deck in meta_percentage:
     print(f"{deck} | {meta_percentage[deck]:.2f}% | {winrate_ratio[deck]}/{meta_ratio[0][2]}")
 
-'''
-Get winrate per player.
-'''
-winners, losers = calc.player_wr(excel_file, date_range[0], date_range[1])
+'''''''''''''''''''''
+GET WINRATE PER PLAYER.
+'''''''''''''''''''''
+
+# Function call to process data.
+winners, losers = calc.player_wr(EXCEL_FILE, date_list)
 winrate_percentage, wr_ratio_list = calc.winrate(winners, losers)
 winrate_ratio = {}
 i = 0
@@ -38,10 +45,12 @@ print("---------------")
 for player in winrate_percentage:
     print(f"{player} | {winrate_percentage[player]:.2f}% | {winrate_ratio[player]["W"]}/{winrate_ratio[player]["M"]}")
 
-'''
-Get winrate per deck.
-'''
-winners, losers = calc.deck_wr(excel_file, date_range[0], date_range[1])
+'''''''''''''''''''''
+GET WINRATE PER DECK.
+'''''''''''''''''''''
+
+# Function calls to process data.
+winners, losers = calc.deck_wr(EXCEL_FILE, date_list)
 winrate_percentage, wr_ratio_list = calc.winrate(winners, losers)
 winrate_ratio = {}
 i = 0
@@ -55,3 +64,22 @@ print("DECK WINRATES")
 print("-------------")
 for deck in winrate_percentage:
     print(f"{deck} | {winrate_percentage[deck]:.2f}% | {winrate_ratio[deck]["W"]}/{winrate_ratio[deck]["M"]}")
+
+'''''''''''''''''''''
+GET MATCHUP MATRIX.
+'''''''''''''''''''''
+
+# Iterate through decks.
+for deck in winrate_percentage:
+    # Function call to get matchup data.
+    matrix_deck = calc.matchup_matrix(EXCEL_FILE, date_list, deck)
+    # Format acquired data.
+    matrix = []
+    for matchup in matrix_deck:
+        matrix.append([deck, matchup, matrix_deck[matchup]])
+    # Print matchups per deck.
+    print()
+    print(f"{deck.upper()} MATRIX")
+    print("-" * len(f"{deck.upper()} MATRIX"))
+    for matchup in matrix:
+        print(f"{matchup[0]} {matchup[2][0]}-{matchup[2][1]} {matchup[1]} | {matchup[2][0]/(matchup[2][0]+matchup[2][1])*100:.2f}%")
