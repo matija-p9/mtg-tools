@@ -70,16 +70,23 @@ GET MATCHUP MATRIX.
 '''''''''''''''''''''
 
 # Iterate through decks.
+matrix_raw = []
 for deck in winrate_percentage:
     # Function call to get matchup data.
     matrix_deck = calc.matchup_matrix(EXCEL_FILE, date_list, deck)
-    # Format acquired data.
-    matrix = []
     for matchup in matrix_deck:
-        matrix.append([deck, matchup, matrix_deck[matchup]])
-    # Print matchups per deck.
-    print()
-    print(f"{deck.upper()} MATRIX")
-    print("-" * len(f"{deck.upper()} MATRIX"))
-    for matchup in matrix:
-        print(f"{matchup[0]} {matchup[2][0]}-{matchup[2][1]} {matchup[1]} | {matchup[2][0]/(matchup[2][0]+matchup[2][1])*100:.2f}%")
+        matrix_raw.append([deck, matchup, matrix_deck[matchup]])
+# Sort data alphabetically.
+from operator import itemgetter
+matrix = sorted(matrix_raw, key=itemgetter(0,1))
+# Print whole matchup matrix.
+deck_previous = ""
+i = 0
+for item in matrix:
+    deck = matrix[i][0]
+    if deck != deck_previous:
+        print(f"\n{deck.upper()} MATRIX")
+        print("-" * len(f"{deck.upper()} MATRIX"))
+        deck_previous = deck
+    print(f"{deck} {matrix[i][2][0]}-{matrix[i][2][1]} {matrix[i][1]} | {matrix[i][2][0]/(matrix[i][2][0]+matrix[i][2][1])*100:.2f}%")
+    i += 1
