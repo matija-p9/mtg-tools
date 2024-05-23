@@ -6,6 +6,7 @@
 
 - [ ] P/D data parsing & refactoring (bold.py)
 - [ ] OOP implementation (Deck class)
+&nbsp;
 
 - [ ] Research and setup visualization tools
   - [ ] Matplotlib - https://www.youtube.com/watch?v=q68Qundmans
