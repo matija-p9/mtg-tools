@@ -48,10 +48,10 @@ def collection_check(card):
     worksheet = openpyxl.load_workbook("./" + EXCEL_FILE).active
 
     # Populate the mtg_collection list.
-    mtg_collection = [] # [CARD NAME (col A), LOCATION (col E)]
+    mtg_collection = [] # [CARD NAME (col B), LOCATION (col F)]
     i = 2 # Start with row 2.
     for row in worksheet:
-        row = [str(worksheet['A'+str(i)].value), str(worksheet['E'+str(i)].value)]
+        row = [str(worksheet['B'+str(i)].value), str(worksheet['F'+str(i)].value)]
         if row != ['None', 'None']:
             mtg_collection.append(row)
         i += 1
