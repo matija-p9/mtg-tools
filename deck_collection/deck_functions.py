@@ -1,16 +1,9 @@
-# Decklist file name
-DECK_LIST = "reference/Deck - Esper Midrange.txt"
-# Collection file name
-EXCEL_FILE = "reference/MTG - Collection.xlsx"
-
-from collections import Counter
-
 #############################################################################
 # Method returns fully counted [COUNT, CARD NAME] list, given a txt decklist.
-def decklist_parse():
+def decklist_parse(deck_list):
 
     # Load decklist txt file.
-    deck = open("./" + DECK_LIST)
+    deck = open("./" + deck_list)
 
     # Deck -> .txt to Python list
     decklist = []
@@ -33,6 +26,7 @@ def decklist_parse():
     pile.sort()
 
     # Deck -> Ordered and counted list
+    from collections import Counter
     c_pile = Counter(pile)
     counted_list = []
     for key in c_pile.keys(): counted_list.append([int(c_pile[key]), key])
@@ -41,11 +35,11 @@ def decklist_parse():
 
 ##########################################################################
 # Method returns [COUNT, CARD NAME, LOCATION], given a card name argument.
-def collection_check(card):
+def collection_check(card, collection):
 
     # Load collection Excel file.
     import openpyxl
-    worksheet = openpyxl.load_workbook("./" + EXCEL_FILE).active
+    worksheet = openpyxl.load_workbook("./" + collection).active
 
     # Populate the mtg_collection list.
     mtg_collection = [] # [CARD NAME (col B), LOCATION (col F)]
@@ -64,6 +58,7 @@ def collection_check(card):
             loc_temp.append(row[1])
             i += 1
     # ...then transform it to the loc_count dict.
+    from collections import Counter
     loc_count = Counter(loc_temp)
 
     # Populate the cards_in_collection list of lists.

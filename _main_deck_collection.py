@@ -1,11 +1,15 @@
+# Decklist and collection files.
+DECK_LIST = "reference/" + "Deck - Esper Control.txt"
+COLLECTION = "reference/" + "MTG - Collection.xlsx"
+
 from deck_collection import deck_functions as df
 
 # Compare the decklist with the collection, write down what's missing.
-decklist = df.decklist_parse()
+decklist = df.decklist_parse(DECK_LIST)
 missing = []
 # Iterate through decklist.
 for line in decklist:
-    coll_check = df.collection_check(line[1])
+    coll_check = df.collection_check(line[1], COLLECTION)
     coll_card_sum = 0
     # Iterate through collection, append to missing.
     for element in coll_check:
