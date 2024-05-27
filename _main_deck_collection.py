@@ -1,4 +1,3 @@
-# Decklist and collection files.
 DECK_LIST = "reference/" + "Deck - Esper Control.txt"
 COLLECTION = "reference/" + "MTG - Collection.xlsx"
 
