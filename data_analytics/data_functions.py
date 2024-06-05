@@ -9,7 +9,7 @@ def tournament_dates(excel_file, t_date_1, t_date_2):
     for cell in ws[1]:
         # Logic to check area between two given dates.
         if t_date_1 in str(cell.value): is_left_bound = True
-        if str(cell.value) != "None" and is_left_bound:
+        if len(str(cell.value)) > 4 and is_left_bound:
             date_list.append(str(cell.value)[:10])
         if t_date_2 in str(cell.value): break
     
