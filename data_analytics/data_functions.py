@@ -86,10 +86,10 @@ def deck_wr(excel_file, date_list):
             if deck_left == deck_right:
                 i += 1
                 continue
-            # Compare score, if equal (draw), both are losers.
+            # COMMENTED OUT # Compare score, if equal (draw), both are losers.
             if ws['C'+str(i)].value == ws['D'+str(i)].value:
-                losers.append(deck_left)
-                losers.append(deck_right)
+                #losers.append(deck_left)
+                #losers.append(deck_right)
                 i += 1
                 continue
             # Check C and D columns for winner and loser, append.
@@ -120,10 +120,10 @@ def player_wr(excel_file, date_list):
             if "ROUND" in str(ws['A'+str(i)].value):
                 i += 1
                 continue
-            # Compare score, if equal (draw), both are losers.
+            # COMMENTED OUT # Compare score, if equal (draw), both are losers.
             if ws['C'+str(i)].value == ws['D'+str(i)].value:
-                losers.append(ws['A'+str(i)].value)
-                losers.append(ws['F'+str(i)].value)
+                #losers.append(ws['A'+str(i)].value)
+                #losers.append(ws['F'+str(i)].value)
                 i += 1
                 continue
             # Check C and D columns for winner and loser, append.

@@ -1,8 +1,8 @@
 from data_analytics import data_functions as df
 import openpyxl
 
-EXCEL_FILE = openpyxl.load_workbook("./reference/MTG Pula - Liga 2024 #1.xlsx")
-DATE_RANGE = ["2024-05-22", "2024-04-24"]
+EXCEL_FILE = openpyxl.load_workbook("./reference/MTG Liga - 2024 #1.xlsx")
+DATE_RANGE = ["2024-06-05", "2024-04-24"]
 
 date_list = df.tournament_dates(EXCEL_FILE, DATE_RANGE[0], DATE_RANGE[1])
 
